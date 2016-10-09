@@ -17,6 +17,8 @@ use libc::{
     unshare,
 };
 
+const NAMESPACES: &'static[&'static str] = &["mnt", "uts", "ipc", "pid", "net"];
+
 pub fn bind_mount(source: &str, target: &str) -> Result<()> {
     let src = CString::new(source).unwrap();
     let dest = CString::new(target).unwrap();
@@ -37,11 +39,10 @@ pub fn umount(target: &str) -> Result<()> {
 }
 
 pub fn nsenter(pid: &pid_t) -> Result<()> {
-    let ns_files: Vec<File> =
-        vec!["mnt", "uts", "ipc", "pid", "net"]
-            .into_iter()
-            .map(|ns| File::open(format!("/proc/{}/ns/{}", pid, ns)).unwrap())
-            .collect();
+    let ns_files: Vec<File> = NAMESPACES
+        .into_iter()
+        .map(|ns| File::open(format!("/proc/{}/ns/{}", pid, ns)).unwrap())
+        .collect();
 
     for file in ns_files {
         if unsafe { setns(file.as_raw_fd(), 0) } != 0 {
