@@ -1,0 +1,8 @@
+[package]
+name = "nsexec"
+version = "0.1.0"
+authors = ["Jason Lai <jlai@uber.com>"]
+
+[dependencies]
+argparse = "0.2"
+libc= "0.2"
